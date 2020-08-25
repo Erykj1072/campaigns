@@ -6,7 +6,7 @@ const app = express();
 
 // Get route handler
 app.get("/", (req, res) => {
-  res.send({ bye: "buddy" });
+  res.send({ ok: "pal" });
 });
 
 // This will default the port to 5000 when in the development environment
