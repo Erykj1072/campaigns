@@ -1,4 +1,4 @@
-  const passport = require("passport");
+const passport = require("passport");
 
 // Only import the strategy property
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
@@ -32,9 +32,9 @@ passport.use(
     {
       clientID: keys.googleClientID,
       clientSecret: keys.googleClientSecret,
-      callbackURL: "/auth/google/callback",
+      callbackURL: "https://lit-falls-07228.herokuapp.com//auth/google/callback",
       // Allow for https through the host proxy
-      proxy: true
+      // proxy: true
     },
     // User information returned by google (Callback function)
     (accessToken, refreshToken, profile, done) => {
