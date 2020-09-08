@@ -32,9 +32,9 @@ passport.use(
     {
       clientID: keys.googleClientID,
       clientSecret: keys.googleClientSecret,
-      callbackURL: "https://lit-falls-07228.herokuapp.com/auth/google/callback",
+      callbackURL: "/auth/google/callback",
       // Allow for https through the host proxy
-      // proxy: true
+      proxy: true
     },
     // User information returned by google (Callback function)
     (accessToken, refreshToken, profile, done) => {
