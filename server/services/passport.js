@@ -37,22 +37,26 @@ passport.use(
       proxy: true
     },
     // User information returned by google (Callback function)
-    (accessToken, refreshToken, profile, done) => {
-      User.findOne({ googleID: profile.id })
-        // This is a promise
-        .then((existingUser) => {
+     async (accessToken, refreshToken, profile, done) => {
+      const existingUser = await User.findOne({ googleID: profile.id })
           if (existingUser) {
-            // We already have a record with the given profile ID so no need to save
-            // err(Error) = null because user was found
-            done(null, existingUser);
-          } else {
-            // Creates a new instance of a user and saves the user ID to the database
-            new User({ googleID: profile.id })
-              .save()
-              // Letting passport know that the save has been complete with no errors
-              .then((user) => done(null, user));
+            return done(null, existingUser);
           }
-        });
+            const user = await new User({ googleID: profile.id }).save()  
+            done(null, user);
+         
+       
     }
   )
 );
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    User.findOne({ username: username }, function (err, user) {
+      if (err) { return done(err); }
+      if (!user) { return done(null, false); }
+      if (!user.verifyPassword(password)) { return done(null, false); }
+      return done(null, user);
+    });
+  }
+));

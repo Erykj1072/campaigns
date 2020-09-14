@@ -10,11 +10,23 @@ module.exports = (app) => {
     })
   );
 
-  app.get("/auth/google/callback", passport.authenticate("google"));
+  app.get("/auth/google/callback", passport.authenticate("google"), 
+  (req,res) => {
+    res.redirect('/surveys');
+  });
   // GOOGLE END
+
+  // LOCAL START
+  app.post('/login', 
+  passport.authenticate('local', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+  });
+  // LOCAL END
 
   app.get("/api/logout", (req, res) => {
     req.logout();
+    res.redirect('/');
   });
 
   app.get("/api/current_user", (req, res) => {

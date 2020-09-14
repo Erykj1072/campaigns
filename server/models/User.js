@@ -4,6 +4,8 @@ const { Schema } = mongoose;
 // Schema describes what a user will look like
 const userSchema = new Schema({
   googleID: String,
+  username: String,
+  password: String
 });
 
 // Create a new collection/ Schema called users
