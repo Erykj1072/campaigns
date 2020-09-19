@@ -1,11 +1,14 @@
 // CommonJS way of importing
 const express = require("express");
 const mongoose = require("mongoose");
+require("./models/User");
 const cookieSession = require("cookie-session");
 const passport = require("passport");
 const keys = require("./config/keys");
+const bodyParser = require("body-parser");
+const cors = require("cors");
 // Nothing is assigned to passport so we can just use require
-require("./models/User");
+
 require("./services/passport");
 
 // MongoDB server connection
@@ -13,6 +16,15 @@ mongoose.connect(keys.mongoURI);
 
 // Express appilcation in app object
 const app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(
+  cors({
+    origin: "/", // <-- location of the react app were connecting to
+    credentials: true,
+  })
+);
 
 app.use(
   cookieSession({

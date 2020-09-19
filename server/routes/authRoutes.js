@@ -1,11 +1,14 @@
 const passport = require("passport");
+const mongoose = require("mongoose");
+const User = mongoose.model("users");
+const bcrypt = require("bcrypt");
 
 module.exports = (app) => {
-  // GOOGLE START
+  // ---------------------GOOGLE AUTH--------------------- //
   app.get(
     "/auth/google",
     passport.authenticate("google", {
-      // What the application wants access to
+      // Information that we are requesting access to from the users google profile
       scope: ["profile", "email"],
     })
   );
@@ -14,16 +17,39 @@ module.exports = (app) => {
   (req,res) => {
     res.redirect('/surveys');
   });
-  // GOOGLE END
+  // ---------------------LOCAL AUTH---------------------- //
 
-  // LOCAL START
-  app.post('/login', 
-  passport.authenticate('local', { failureRedirect: '/login' }),
-  function(req, res) {
-    res.redirect('/');
+  app.post("/auth/signin", (req, res) => {
+    passport.authenticate("local", (err, user, info) => {
+      if (err) throw err;
+      if (!user) res.send("No Uuer found");
+      else {
+        req.logIn(user, (err) => {
+          if (err) throw err;
+          res.send("Successfully authenticated");
+          // res.redirect("/surveys");
+          console.log(req.user);
+        });
+      }
+    })(req, res);
   });
-  // LOCAL END
 
+  app.post("/auth/register", (req, res) => {
+    User.findOne({ username: req.body.username }, async (err, doc) =>{
+      if (err) throw err;
+      if (doc) res.send("User already exists");
+      if (!doc) {
+        const hash = await bcrypt.hash(req.body.password, 10);
+        await new User({
+          username: req.body.username,
+          password: hash,
+        }).save();
+        res.send("Successfuly registered");
+      }
+    })
+  });
+
+// -------------------------API------------------------- //
   app.get("/api/logout", (req, res) => {
     req.logout();
     res.redirect('/');

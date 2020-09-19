@@ -4,6 +4,7 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const LocalStrategy = require("passport-local").Strategy;
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const keys = require("../config/keys");
 
 // Used to pull out a schema out of mongoose considering it has been created
@@ -50,13 +51,23 @@ passport.use(
   )
 );
 
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-    User.findOne({ username: username }, function (err, user) {
-      if (err) { return done(err); }
-      if (!user) { return done(null, false); }
-      if (!user.verifyPassword(password)) { return done(null, false); }
-      return done(null, user);
+
+passport.use(
+  new LocalStrategy((username, password, done) => {
+    User.findOne({ username: username }, (err, user) => {
+      if (err) throw err;
+      if (!user) return done(null, false);
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (err) throw err;
+        if (result === true) {
+          return done(null, user);
+        } else {
+          return done(null, false);
+        }
+      });
     });
-  }
-));
+  })
+);
+
+
+
